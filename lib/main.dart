@@ -7,11 +7,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'QR Scanner',
+      title: 'Escanear codigo QR',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'QR Scanner'),
+      home: MyHomePage(title: 'Escanear codigo QR'),
     );
   }
 }
@@ -43,8 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: _result != null
-            ? Text('Result: $_result')
-            : Text('Press the button to scan a QR code'),
+            ? Text('Resultado: $_result')
+            : Text('Precione el boton para escanear le codigo '),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _scanQR,
