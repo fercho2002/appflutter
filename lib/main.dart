@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'QR Scanner',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'QR Scanner'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  late QRViewController controller;
-  late String qrText;
+  String? _result;
+
+  Future<void> _scanQR() async {
+    final result = await scanner.scan();
+    setState(() {
+      _result = result;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,52 +41,16 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 5,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Center(
-              child: Text('Scan result: $qrText'),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  controller.resumeCamera();
-                },
-                child: Text('Resume'),
-              ),
-            ),
-          )
-        ],
+      body: Center(
+        child: _result != null
+            ? Text('Result: $_result')
+            : Text('Press the button to scan a QR code'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _scanQR,
+        tooltip: 'Scan',
+        child: Icon(Icons.qr_code_scanner),
       ),
     );
-  }
-
-  void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      this.controller = controller;
-    });
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        qrText = scanData.code;
-      });
-      controller.pauseCamera();
-    });
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }
